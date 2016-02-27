@@ -10,6 +10,7 @@ using Chapter6TicTacToe.Players;
 using Chapter6TicTacToe.Players.MinMax;
 using Chapter6TicTacToe.Players.Neural;
 using Chapter6TicTacToe.Game;
+using System.Diagnostics;
 
 namespace Chapter6TicTacToe
 {
@@ -20,9 +21,9 @@ namespace Chapter6TicTacToe
         public const double MATE_PERCENT = 0.25;
         public const int NEURONS_HIDDEN_1 = 10;
         public const int NEURONS_HIDDEN_2 = 0;
-        public const int TRAIN_MINUTES = 5;
+        public const int TRAIN_MINUTES = 90;
         public const int SCORE_SAMPLE = 100;
-        public const int THREAD_POOL_SIZE = 2;
+        public const int THREAD_POOL_SIZE = 2^10;
 
         public static FeedforwardNetwork createNetwork()
         {
@@ -95,6 +96,7 @@ namespace Chapter6TicTacToe
         {
             try
             {
+                //args = match MinMax Random
                 NeuralTicTacToe ttt = new NeuralTicTacToe();
 
                 if (args.Length < 3)
@@ -151,6 +153,7 @@ namespace Chapter6TicTacToe
 
         public void geneticNeural()
         {
+            Stopwatch sw = new Stopwatch();
             FeedforwardNetwork network = createNetwork();
             // train the neural network
             Console.WriteLine("Determining initial scores");
@@ -159,25 +162,34 @@ namespace Chapter6TicTacToe
                    NeuralTicTacToe.MUTATION_PERCENT, NeuralTicTacToe.MATE_PERCENT,
                    this.player2.GetType());
             train.UseThreadPool = true;
+            sw.Stop();
+
+            string duration = String.Format("Training_time: {0}", sw.Elapsed.Minutes);
+            Console.WriteLine(duration);
+
             ThreadPool.SetMaxThreads(NeuralTicTacToe.THREAD_POOL_SIZE, NeuralTicTacToe.THREAD_POOL_SIZE);
             int epoch = 1;
 
             DateTime started = DateTime.Now;
 
             int minutes = 0;
+            double error = train.getScore();
+
             do
             {
-                train.Iteration();
+                sw.Start();
+                error = train.getScore();
+                if (error > 0)
+                    train.Iteration();
+                sw.Stop();
 
-                TimeSpan span = (DateTime.Now - started);
-                minutes = span.Minutes;
+                minutes = sw.Elapsed.Minutes;
 
-                Console.WriteLine("Epoch #" + epoch + " Error:" + train.getScore()
-                        + ",minutes left="
-                        + (NeuralTicTacToe.TRAIN_MINUTES - minutes));
+                string observation = String.Format("Epoch: {0}, Error:{1}, minutes_left : {2}", epoch, error, (NeuralTicTacToe.TRAIN_MINUTES - minutes));
+                Console.WriteLine(observation);
                 epoch++;
 
-            } while (minutes < NeuralTicTacToe.TRAIN_MINUTES);
+            } while (minutes < NeuralTicTacToe.TRAIN_MINUTES && error > 0.00001d);
 
             SerializeObject.Save("tictactoe.net", train.Network);
         }

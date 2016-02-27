@@ -57,7 +57,26 @@ namespace Chapter6TicTacToe.Game
 		}
 		return true;
 	}
+    public static Move[] GetEmptyPositions(int[,] board, int visual)
+    {
+        int length = board.Length, actualSize = 0;
+        Move[] emptyPositions = new Move[] { };
+        Array.Resize(ref emptyPositions, length);
 
+        for (int x = 0; x < 3; x++)
+        {
+            for (int y = 0; y < 3; y++)
+            {
+                if (board[x, y] == TicTacToe.EMPTY)
+                {
+                    emptyPositions[actualSize] = new Move(x, y, visual);
+                    actualSize++;
+                }
+            }
+        }
+        Array.Resize(ref emptyPositions, actualSize);
+        return emptyPositions;
+    }
 	/**
 	 * Determines if the specified player has won at the current board position.
 	 * 

@@ -9,24 +9,11 @@ namespace Chapter6TicTacToe.Players.MinMax
 {
     class PlayerMinMax: Player
     {
-	// Internal representation of wheter this AI is noughts or crosses.
+	/// <summary>
+	/// Current AI player
+	/// </summary>
 	private int _player = TicTacToe.EMPTY;
 
-	/**
-	 * Gets the next move of this player.
-	 * 
-	 * @param board
-	 *            <code>Board</code> representation of the current game state.
-	 * @param prev
-	 *            <code>Move</code> representing the previous move in the the
-	 *            game.
-	 * @param color
-	 *            <code>int</code> representing the pieces this
-	 *            <code>Player</code> is playing with. One of
-	 *            <code>TicTacToe.NOUGHTS</code> or
-	 *            <code>TicTacToe.CROSSES</code>
-	 * @return <code>Move</code> Next move of this player.
-	 */
 	public Move getMove( int[,] board,  Move prev,  int color) {
 
 		this._player = color;
@@ -34,10 +21,12 @@ namespace Chapter6TicTacToe.Players.MinMax
 		 Node root = new Node(board, prev);
 		int max = int.MinValue;
 
-		Node child;
+		//Node child;
 		Node bestNode = null;
 
-		while ((child = root.getChild()) != null) {
+        //while ((child = root.getChild()) != null) {
+        foreach (var child in root.Successors(null))
+        {                    		
 			 int val = minimaxAB(child, true, int.MinValue,
 					int.MaxValue);
 			if (val >= max) {
@@ -50,9 +39,15 @@ namespace Chapter6TicTacToe.Players.MinMax
 
 	}
 
-	// Implementation of mimimax with alpha-beta pruning.
-	private int minimaxAB( Node n,  bool min,  int a,
-			 int b) {
+	/// <summary>
+	/// 
+	/// </summary>
+	/// <param name="n"></param>
+	/// <param name="min"></param>
+	/// <param name="a"></param>
+	/// <param name="b"></param>
+	/// <returns></returns>
+	private int minimaxAB( Node n,  bool min,  int a,int b) {
 
 		int alpha = a;
 		int beta = b;
@@ -61,10 +56,13 @@ namespace Chapter6TicTacToe.Players.MinMax
 			return n.value(this._player);
 		}
 
-		Node child;
+        if (alpha > beta)
+            return min ? beta : alpha;
+		//Node child;
+        //
 
 		if (min) {
-			while (((child = n.getChild()) != null) && !(alpha > beta)) {
+			foreach (var child in n.Successors(null)){
 				 int val = minimaxAB(child, false, alpha, beta);
 				if (val < beta) {
 					beta = val;
@@ -72,7 +70,7 @@ namespace Chapter6TicTacToe.Players.MinMax
 			}
 			return beta;
 		} else {
-			while (((child = n.getChild()) != null) && !(alpha > beta)) {
+			foreach (var child in n.Successors(null)){
 				 int val = minimaxAB(child, true, alpha, beta);
 				if (val > alpha) {
 					alpha = val;

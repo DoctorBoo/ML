@@ -36,7 +36,7 @@ namespace Chapter6TicTacToe.Game
 			 Player []players = new Player[2];
 			players[0] = this.player;
 			players[1] = this.aganst;
-			 Game game = new Game(players);
+			  Game game = new Game(players);
 			 Player winner = game.play();
 
 			if (this.verbose) {

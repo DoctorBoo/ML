@@ -75,7 +75,26 @@ namespace Chapter6TicTacToe.Players.MinMax
 		}
 		return temp;
 	}
+    /// <summary>
+    /// Gets random successor
+    /// </summary>
+    /// <param name="heuristic"></param>
+    /// <returns></returns>
+    public IEnumerable<Node> Successors(Func<bool, int, int> heuristic)
+    {
+        Move[] moves = Board.GetEmptyPositions(_board, player());
+        moves = moves.Randomize();
+        int length = moves.Length;
 
+        for (int i = 0; i < length; i++)
+        {
+            int[,] newPos = Board.copy(_board);
+            Move move = moves[i];
+            Board.placePiece(newPos, move);
+            Node successor = new Node(newPos, move);
+            yield return successor;
+        }
+    }
 	/**
 	 * Gets the "next" child for this node, or <code>null</code> if all
 	 * children of this node have already been found.

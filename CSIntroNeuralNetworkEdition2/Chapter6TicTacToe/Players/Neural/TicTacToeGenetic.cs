@@ -5,13 +5,15 @@ using System.Text;
 
 using HeatonResearchNeural.Feedforward;
 using HeatonResearchNeural.Feedforward.Train.Genetic;
+using System.Collections.Concurrent;
+using System.Threading.Tasks;
 
 namespace Chapter6TicTacToe.Players.Neural
 {
     class TicTacToeGenetic : NeuralGeneticAlgorithm
     {
         private Type opponent;
-
+        object _locker = new object();
 
 
 
@@ -29,20 +31,29 @@ namespace Chapter6TicTacToe.Players.Neural
             this.PercentToMate=percentToMate;
 
             this.Chromosomes = new TicTacToeChromosome[this.PopulationSize];
-            for (int i = 0; i < this.Chromosomes.Length; i++)
+            var rangePartitioner = Partitioner.Create(0, this.Chromosomes.Length);
+            //Parallel.ForEach(rangePartitioner, (range, loopState) =>
             {
-                FeedforwardNetwork chromosomeNetwork = (FeedforwardNetwork)network
-                        .Clone();
-                if (reset)
+                for (int i = 0; i < Chromosomes.Length; i++)
                 {
-                    chromosomeNetwork.Reset();
-                }
+                    Console.WriteLine("step: " + i);
+                    FeedforwardNetwork chromosomeNetwork = (FeedforwardNetwork)network
+                            .Clone();
+                    if (reset)
+                    {
+                        chromosomeNetwork.Reset();
+                    }
 
-                TicTacToeChromosome c = new TicTacToeChromosome(this,
-                        chromosomeNetwork);
-                c.UpdateGenes();
-                SetChromosome(i, c);
-            }
+                    TicTacToeChromosome c = new TicTacToeChromosome(this,
+                            chromosomeNetwork);
+                    c.UpdateGenes();
+                    lock (_locker)
+                    {
+                        SetChromosome(i, c);
+                    }                    
+                }
+            };
+            Console.WriteLine("PreEpoch # Error:" + getScore());
             SortChromosomes();
         }
 

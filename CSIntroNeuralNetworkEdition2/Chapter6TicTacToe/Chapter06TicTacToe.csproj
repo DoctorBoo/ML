@@ -70,6 +70,7 @@
   <ItemGroup>
     <Compile Include="Game\Board.cs" />
     <Compile Include="Game\Game.cs" />
+    <Compile Include="Game\Helper.cs" />
     <Compile Include="Game\Move.cs" />
     <Compile Include="Game\ScorePlayer.cs" />
     <Compile Include="Game\TicTacToe.cs" />
@@ -94,6 +95,9 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="app.config" />
+    <None Include="tictactoe.635922024048104388.net" />
+    <None Include="tictactoe.net" />
+    <None Include="tictactoe.random.net" />
   </ItemGroup>
   <ItemGroup>
     <BootstrapperPackage Include="Microsoft.Net.Client.3.5">
